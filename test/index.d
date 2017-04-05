@@ -1,4 +1,7 @@
 
+(gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\test\java\)
+(sgen JS     client C:\Users\admin\Desktop\github\rpc2j\test\js\)
+
 (include a.d)
 
 (ns common)
@@ -17,7 +20,6 @@
 (method server getTime4 [UserInfo] [common.UserInfo])
 (method server getTime2 [{www:int}] {sss:String})
 (method client getTime3 [{name:int sss:[string]}] {abc:int sss:string})
-
 
 
 (ns WWW)

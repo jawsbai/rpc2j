@@ -3,12 +3,12 @@ var readFile = require('./readFile.es6'),
     genCode = require('./genCode.es6');
 
 var tokens = readFile('../../test/index.d');
-console.log(tokens);
+console.log('tokens', tokens);
 console.log('-----------');
 var ast = new AST(tokens);
-var nodes = ast.parse();
+var nodeList = ast.parse();
 
 // console.log(JSON.stringify(nodes, null, 4));
 
 
-genCode(nodes);
+genCode(nodeList);

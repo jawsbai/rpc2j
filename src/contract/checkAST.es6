@@ -1,6 +1,7 @@
 var NODE = require('./NODE.es6'),
     odts = require('./odts.es6'),
-    TypeRef = require('./TypeRef.es6');
+    TypeRef = require('./TypeRef.es6'),
+    NodeList = require('./NodeList.es6');
 
 function camelName(name) {
     var ss = name.split('');
@@ -8,34 +9,16 @@ function camelName(name) {
     return ss.join('');
 }
 
-function findNode(nodes, node) {
-    return nodes.filter(item=>
-        item.ns == node.ns &&
-        item.name == node.name &&
-        item != node).length > 0;
-}
-function findType(typeNodes, typeRef, ignoreTypeNode) {
-    return typeNodes.filter(item=>
-    item.ns == typeRef.ns &&
-    item.name == typeRef.name &&
-    (!ignoreTypeNode || item != ignoreTypeNode))[0];
-}
-function findFiled(fields, field) {
-    return fields.filter(item=>
-        item.name == field.name &&
-        item != field).length > 0;
-}
 function findODT(name) {
     return odts[name.toLowerCase()];
 }
-
-function checkTypeRef(typeNodes, typeRef, ignoreTypeNode = null) {
+function checkTypeRef(nodeList, typeRef, ignoreTypeNode = null) {
     var odt = findODT(typeRef.name);
     if (odt) {
         typeRef.name = typeRef.name.toLowerCase();
-        typeRef.type = odt;
+        typeRef.type = new TypeRef(odt);
     } else {
-        var type = findType(typeNodes, typeRef, ignoreTypeNode);
+        var type = nodeList.findTypeByRef(typeRef, ignoreTypeNode);
         if (!type) {
             throw new Error(`type:${typeRef.ns}.${typeRef.name} not found.`);
         }
@@ -43,37 +26,43 @@ function checkTypeRef(typeNodes, typeRef, ignoreTypeNode = null) {
         typeRef.type = new TypeRef(type);
     }
 }
-function checkMethod(typeNodes, methodNode) {
+
+function checkMethod(nodeList, methodNode) {
     if (methodNode.argTypeRef) {
-        checkTypeRef(typeNodes, methodNode.argTypeRef);
+        checkTypeRef(nodeList, methodNode.argTypeRef);
     }
     if (methodNode.retTypeRef) {
-        checkTypeRef(typeNodes, methodNode.retTypeRef);
+        checkTypeRef(nodeList, methodNode.retTypeRef);
     }
 }
-function checkType(typeNodes, typeNode) {
+function checkMethods(nodeList) {
+    nodeList.findMethods().forEach(node=>checkMethod(nodeList, node));
+}
+
+function findFiled(fields, field) {
+    return fields.filter(item=> item.name == field.name && item != field).length > 0;
+}
+function checkType(nodeList, typeNode) {
     typeNode.fields.forEach(field=> {
         if (findFiled(typeNode.fields, field)) {
             throw new Error(`field:${typeNode.name}.${field.name} cannot duplicate definition.`);
         }
 
-        checkTypeRef(typeNodes, field.typeRef, typeNode);
+        checkTypeRef(nodeList, field.typeRef, typeNode);
     });
 }
+function checkTypes(nodeList) {
+    nodeList.findTypes().forEach(node=>checkType(nodeList, node));
+}
 
-function checkNodes(nodes) {
-    var notNSNodes = nodes.filter(node=>node.nodeType != NODE.NS);
-    var typeNodes = nodes.filter(node=>node.nodeType == NODE.TYPE);
-    notNSNodes.forEach(node=> {
-        if (findNode(notNSNodes, node)) {
+function checkNamedNodes(nodeList) {
+    var dic = {};
+    nodeList.findNamedNodes().forEach(node=> {
+        var key = `${node.ns}${node.name}`;
+        if (dic[key]) {
             throw new Error(`${node.nodeType}:${node.name} cannot duplicate definition.`);
         }
-
-        if (node.nodeType == NODE.TYPE) {
-            checkType(typeNodes, node);
-        } else if (node.nodeType == NODE.METHOD) {
-            checkMethod(typeNodes, node);
-        }
+        dic[key] = 1;
     });
 }
 
@@ -102,39 +91,48 @@ function initTypeRef(ns, typeRef, name, nodes) {
 
     nodes.push(createType);
 }
-
-function checkAST(nodes) {
-    var ns = null;
+function initNodes(nodes) {
+    var currentNS = null;
     nodes.forEach(node=> {
         if (node.nodeType == NODE.NS) {
-            ns = node;
+            currentNS = node;
         }
 
         if (node.nodeType == NODE.TYPE || node.nodeType == NODE.METHOD) {
-            if (!ns) {
+            if (!currentNS) {
                 throw new Error('ns definition is missing.');
             }
 
-            node.ns = ns.name;
+            node.ns = currentNS.name;
         }
 
         if (node.nodeType == NODE.TYPE) {
             node.fields.forEach(field=> {
-                initTypeRef(ns, field.typeRef, `${node.name}_${camelName(field.name)}`, nodes);
+                initTypeRef(currentNS, field.typeRef, `${node.name}_${camelName(field.name)}`, nodes);
             });
         }
 
         if (node.nodeType == NODE.METHOD) {
             if (node.argTypeRef) {
-                initTypeRef(ns, node.argTypeRef, `${node.name}_Arg`, nodes);
+                initTypeRef(currentNS, node.argTypeRef, `${node.name}_Arg`, nodes);
             }
             if (node.retTypeRef) {
-                initTypeRef(ns, node.retTypeRef, `${node.name}_Ret`, nodes);
+                initTypeRef(currentNS, node.retTypeRef, `${node.name}_Ret`, nodes);
             }
         }
     });
+}
 
-    checkNodes(nodes);
+function checkAST(nodes) {
+    initNodes(nodes);
+
+    var nodeList = new NodeList(nodes);
+
+    checkNamedNodes(nodeList);
+    checkTypes(nodeList);
+    checkMethods(nodeList);
+
+    return nodeList;
 }
 
 module.exports = checkAST;

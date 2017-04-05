@@ -6,6 +6,18 @@ class AST {
         this._tokens = tokens;
     }
 
+    _parse_gen(list) {
+        if (list.length < 4) {
+            return null;
+        }
+        return {
+            nodeType: NODE.GEN,
+            lang: list[1].toUpperCase(),
+            end: list[2],
+            path: list[3]
+        };
+    }
+
     _parse_ns(list) {
         if (list.length < 2) {
             return null;
@@ -117,15 +129,13 @@ class AST {
         return this._tokens.inlines.filter(item=>item.id == id)[0];
     }
 
-    _trimList() {
-        return this._tokens.list
-            .filter(item=> item.length && this._findParse(item[0]));
+    _findList() {
+        return this._tokens.list.filter(item=> item.length && this._findParse(item[0]));
     }
 
     parse() {
         var nodes = [];
-
-        this._trimList().forEach(list=> {
+        this._findList().forEach(list=> {
             var parse = this._findParse(list[0]);
             var node = parse.bind(this)(list);
             if (node) {
@@ -133,9 +143,7 @@ class AST {
             }
         });
 
-        checkAST(nodes);
-
-        return nodes;
+        return checkAST(nodes);
     }
 }
 
