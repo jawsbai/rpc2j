@@ -1,5 +1,5 @@
 
-(gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\test\java\)
+(gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\test\src\)
 (sgen JS     client C:\Users\admin\Desktop\github\rpc2j\test\js\)
 
 (include a.d)

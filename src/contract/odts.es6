@@ -1,4 +1,5 @@
-var LANG = require('./LANG.es6');
+var GEN = require('./GEN.es6'),
+    LANG = require('./LANG.es6');
 
 class ODT {
     constructor() {
@@ -7,6 +8,18 @@ class ODT {
     getName(lang) {
         return this[`getName_${lang}`]();
     }
+
+    getEmpty(lang) {
+        return this[`getEmpty_${lang}`]();
+    }
+
+    getRead(lang) {
+        return this[`getRead_${lang}`]();
+    }
+
+    getWrite(lang) {
+        return this[`getWrite_${lang}`]();
+    }
 }
 
 class ODTBool extends ODT {
@@ -14,8 +27,12 @@ class ODTBool extends ODT {
         super();
     }
 
-    getName_JAVA(){
-        return 'boolean';
+    getName_JAVA() {
+        return 'Boolean';
+    }
+
+    getEmpty_JAVA() {
+        return 'false';
     }
 }
 
@@ -24,8 +41,12 @@ class ODTByte extends ODT {
         super();
     }
 
-    getName_JAVA(){
+    getName_JAVA() {
         return 'Byte';
+    }
+
+    getEmpty_JAVA() {
+        return '0';
     }
 }
 
@@ -34,8 +55,12 @@ class ODTShort extends ODT {
         super();
     }
 
-    getName_JAVA(){
+    getName_JAVA() {
         return 'Short';
+    }
+
+    getEmpty_JAVA() {
+        return '0';
     }
 }
 
@@ -44,18 +69,26 @@ class ODTInt extends ODT {
         super();
     }
 
-    getName_JAVA(){
-        return 'Int';
+    getName_JAVA() {
+        return 'int';
+    }
+
+    getEmpty_JAVA() {
+        return '0';
     }
 }
 
-class ODTTime extends ODT {
+class ODTDate extends ODT {
     constructor() {
         super();
     }
 
-    getName_JAVA(){
+    getName_JAVA() {
         return 'Date';
+    }
+
+    getEmpty_JAVA() {
+        return 'new Date()';
     }
 }
 
@@ -64,16 +97,25 @@ class ODTString extends ODT {
         super();
     }
 
-    getName_JAVA(){
+    getName_JAVA() {
         return 'String';
+    }
+
+    getEmpty_JAVA() {
+        return '""';
     }
 }
 
-module.exports = {
+var map = {
     'bool': new ODTBool(),
     'byte': new ODTByte(),
     'short': new ODTShort(),
     'int': new ODTInt(),
-    'Time': new ODTTime(),
+    "date": new ODTDate(),
     'string': new ODTString()
+};
+
+module.exports = {
+    map: map,
+    types: [map.bool, map.byte, map.short, map.int, map.date, map.string]
 };

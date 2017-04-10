@@ -1,16 +1,11 @@
 var NODE = require('./NODE.es6'),
     odts = require('./odts.es6'),
     TypeRef = require('./TypeRef.es6'),
-    NodeList = require('./NodeList.es6');
-
-function camelName(name) {
-    var ss = name.split('');
-    ss[0] = ss[0].toUpperCase();
-    return ss.join('');
-}
+    NodeList = require('./NodeList.es6'),
+    firstCharUpper = require('./firstCharUpper.es6');
 
 function findODT(name) {
-    return odts[name.toLowerCase()];
+    return odts.map[name.toLowerCase()];
 }
 function checkTypeRef(nodeList, typeRef, ignoreTypeNode = null) {
     var odt = findODT(typeRef.name);
@@ -108,7 +103,7 @@ function initNodes(nodes) {
 
         if (node.nodeType == NODE.TYPE) {
             node.fields.forEach(field=> {
-                initTypeRef(currentNS, field.typeRef, `${node.name}_${camelName(field.name)}`, nodes);
+                initTypeRef(currentNS, field.typeRef, `${node.name}_${firstCharUpper(field.name)}`, nodes);
             });
         }
 
