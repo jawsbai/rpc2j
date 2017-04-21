@@ -11,14 +11,14 @@ function checkTypeRef(nodeList, typeRef, ignoreTypeNode = null) {
     var odt = findODT(typeRef.name);
     if (odt) {
         typeRef.name = typeRef.name.toLowerCase();
-        typeRef.type = new TypeRef(odt);
+        typeRef.type = new TypeRef(odt, typeRef.isArray);
     } else {
         var type = nodeList.findTypeByRef(typeRef, ignoreTypeNode);
         if (!type) {
             throw new Error(`type:${typeRef.ns}.${typeRef.name} not found.`);
         }
 
-        typeRef.type = new TypeRef(type);
+        typeRef.type = new TypeRef(type, typeRef.isArray);
     }
 }
 

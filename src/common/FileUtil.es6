@@ -1,60 +1,60 @@
 var fs = require('fs'),
     P = require('path');
 
-function exists(path) {
-    return fs.existsSync(path);
-}
+class FileUtil {
+    static exists(path) {
+        return fs.existsSync(path);
+    }
 
-module.exports = {
-    exists: exists,
+    static readdir(path) {
+        return fs.readdirSync(path).map(item=>P.join(path, item));
+    }
 
-    readdir: function (path) {
-        var list = [];
-        fs.readdirSync(path).forEach(function (item) {
-            list.push(P.join(path, item));
-        });
-        return list;
-    },
-
-    readString: function (path, encoding = 'utf8') {
+    static readString(path, encoding = 'utf8') {
         return fs.readFileSync(path, encoding);
-    },
+    }
 
-    writeString: function (path, content, encoding = 'utf8') {
+    static writeString(path, content, encoding = 'utf8') {
         return fs.writeFileSync(path, content, encoding);
-    },
+    }
 
-    readFile: function (path) {
+    static readFile(path) {
         return fs.readFileSync(path);
-    },
+    }
 
-    writeFile: function (path, content) {
+    static writeFile(path, content) {
         return fs.writeFileSync(path, content);
-    },
+    }
 
-    copy: function (src, dest) {
+    static copy(src, dest) {
         return fs.writeFileSync(dest, fs.readFileSync(src));
-    },
+    }
 
-    stat: function (path) {
+    static stat(path) {
         return fs.statSync(path);
-    },
+    }
 
-    mkdir: function (path) {
+    static getMTime(path) {
+        return FileUtil.stat(path).mtime.getTime()
+    }
+
+    static mkdir(path) {
         fs.mkdirSync(path);
-    },
+    }
 
-    unlink: function (path) {
+    static unlink(path) {
         fs.unlinkSync(path);
-    },
+    }
 
-    mkdirs: function (path, root = '') {
+    static mkdirs(path, root = '') {
         path.split(P.sep).forEach(function (item) {
             root += P.sep + item;
 
-            if (!exists(root)) {
+            if (!FileUtil.exists(root)) {
                 fs.mkdirSync(root);
             }
         });
     }
-};
+}
+
+module.exports = FileUtil;

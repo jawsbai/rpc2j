@@ -1,5 +1,5 @@
 
-(gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\test\src\)
+(gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\src\contract\java_contract\src)
 (sgen JS     client C:\Users\admin\Desktop\github\rpc2j\test\js\)
 
 (include a.d)
@@ -12,7 +12,7 @@
     aa2:{abc:int test:int}
     sss:[{sss:int cbd:string}])
 
-(type UserInfo334 ss:int)
+(type UserInfo334 ss:[int])
 
 (method server UserInfo33 [UserInfo] [common.UserInfo])
 

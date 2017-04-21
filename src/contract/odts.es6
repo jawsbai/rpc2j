@@ -28,7 +28,7 @@ class ODTBool extends ODT {
     }
 
     getName_JAVA() {
-        return 'Boolean';
+        return 'boolean';
     }
 
     getEmpty_JAVA() {
@@ -42,7 +42,7 @@ class ODTByte extends ODT {
     }
 
     getName_JAVA() {
-        return 'Byte';
+        return 'byte';
     }
 
     getEmpty_JAVA() {
@@ -56,7 +56,7 @@ class ODTShort extends ODT {
     }
 
     getName_JAVA() {
-        return 'Short';
+        return 'short';
     }
 
     getEmpty_JAVA() {

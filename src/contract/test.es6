@@ -10,5 +10,4 @@ var nodeList = ast.parse();
 
 // console.log(JSON.stringify(nodes, null, 4));
 
-
 genCode(nodeList);

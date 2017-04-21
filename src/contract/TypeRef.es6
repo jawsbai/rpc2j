@@ -2,37 +2,48 @@ var GEN = require('./GEN.es6'),
     firstCharUpper = require('./firstCharUpper.es6');
 
 class TypeRef {
-    constructor(type) {
+    constructor(type, isArray) {
         this._type = type;
+        this._isArray = isArray;
         this._isNodeType = !!this._type.nodeType;
     }
 
-    getFullName(lang) {
+    _typeName(lang) {
         if (this._isNodeType) {
             return `${this._type.ns}.${this._type.name}`;
         }
         return this._type.getName(lang);
     }
 
-    getEmpty(lang) {
+    _typeName2(lang, prefix) {
         if (this._isNodeType) {
-            return `${this._type.ns}.${this._type.name}.newEmpty()`;
+            return `${prefix}${firstCharUpper(this._type.name)}`;
         }
-        return this._type.getEmpty(lang);
+        return `${prefix}${firstCharUpper(this._type.getName(lang))}`;
+    }
+
+    getFullName(lang) {
+        var a = this._isArray ? '[]' : '';
+        return `${this._typeName(lang)}${a}`;
+    }
+
+    getEmpty(lang) {
+        if (!this._isNodeType && !this._isArray) {
+            return this._type.getEmpty(lang);
+        }
+
+        var a = this._isArray ? '[]{}' : '()';
+        return `new ${this._typeName(lang)}${a}`;
     }
 
     getRead(lang) {
-        if (this._isNodeType) {
-            return `read${firstCharUpper(this._type.name)}`;
-        }
-        return `read${firstCharUpper(this._type.getName(lang))}`;
+        var a = this._isArray ? 'Array' : '';
+        return `${this._typeName2(lang, 'read')}${a}`;
     }
 
     getWrite(lang) {
-        if (this._isNodeType) {
-            return `write${firstCharUpper(this._type.name)}`;
-        }
-        return `write${firstCharUpper(this._type.getName(lang))}`;
+        var a = this._isArray ? 'Array' : '';
+        return `${this._typeName2(lang, 'write')}${a}`;
     }
 }
 
