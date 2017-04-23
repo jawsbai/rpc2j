@@ -4,7 +4,6 @@ var Gen = require('./Gen.es6'),
     CodeFile = require('../CodeFile.es6'),
     P = require('path'),
     FileUtil = require('../../common/FileUtil.es6'),
-    LANG = require('../LANG.es6'),
     firstCharUpper = require('../firstCharUpper.es6');
 
 class GenJAVA extends Gen {
@@ -21,14 +20,14 @@ class GenJAVA extends Gen {
         var codeFile = new CodeFile(typeNode.ns, typeName);
 
         var args = this.mapTypeFields(typeNode, (f, t)=> {
-            return `${t.getFullName(this.lang)} ${f.name}`;
+            return `${t.nameTypeExpr(this.lang)} ${f.name}`;
         });
 
         codeFile.append(`
         package ${typeNode.ns};
         public class ${typeName} {
             ${this.mapTypeFields(typeNode, (f, t)=>`
-            public final ${t.getFullName(this.lang)} ${f.name};`).join('\n')}
+            public final ${t.nameTypeExpr(this.lang)} ${f.name};`).join('\n')}
 
             public ${typeName}(){
                 ${this.mapTypeFields(typeNode, (f, t)=>`
@@ -141,12 +140,6 @@ class GenJAVA extends Gen {
         codeFiles.forEach(codeFile=> {
             this.writeFile(codeFile, '.java');
         });
-
-        // this._makeTypes();
-        // console.log(this._makeTypeReader().getCode());
-        // console.log(this._makeTypeWriter().getCode());
-        // console.log(this._makeODTWriter().getCode());
-        // console.log(this._makeODTReader().getCode());
     }
 }
 

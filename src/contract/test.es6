@@ -8,6 +8,8 @@ console.log('-----------');
 var ast = new AST(tokens);
 var nodeList = ast.parse();
 
+console.log(nodeList);
+
 // console.log(JSON.stringify(nodes, null, 4));
 
 genCode(nodeList);

@@ -13,7 +13,7 @@ class AST {
         return {
             nodeType: NODE.GEN,
             lang: list[1].toUpperCase(),
-            end: list[2],
+            end: list[2].toUpperCase(),
             path: list[3]
         };
     }
@@ -41,7 +41,7 @@ class AST {
         return {
             nodeType: NODE.METHOD,
             ns: '',
-            end: list[1],
+            end: list[1].toUpperCase(),
             name: list[2],
             argTypeRef: argRef,
             retTypeRef: retRef

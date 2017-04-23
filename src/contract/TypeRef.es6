@@ -8,9 +8,9 @@ class TypeRef {
         this._isNodeType = !!this._type.nodeType;
     }
 
-    _typeName(lang) {
+    fullName(lang, sep = '.') {
         if (this._isNodeType) {
-            return `${this._type.ns}.${this._type.name}`;
+            return `${this._type.ns.split('.').join(sep)}${sep}${this._type.name}`;
         }
         return this._type.getName(lang);
     }
@@ -22,9 +22,15 @@ class TypeRef {
         return `${prefix}${firstCharUpper(this._type.getName(lang))}`;
     }
 
-    getFullName(lang) {
+    nameTypeExpr(lang) {
         var a = this._isArray ? '[]' : '';
-        return `${this._typeName(lang)}${a}`;
+        return `${this.fullName(lang)}${a}`;
+    }
+
+    nameTypeExpr2(lang) {
+        var a = '', b = '';
+        this._isArray && ([a, b] = ['[', ']']);
+        return `${a}${this.fullName(lang, '_')}${b}`;
     }
 
     getEmpty(lang) {
@@ -33,7 +39,19 @@ class TypeRef {
         }
 
         var a = this._isArray ? '[]{}' : '()';
-        return `new ${this._typeName(lang)}${a}`;
+        return `new ${this.fullName(lang)}${a}`;
+    }
+
+    getEmpty2(lang) {
+        if (this._isArray) {
+            return '[]';
+        }
+
+        if (this._isNodeType) {
+            return `${this.fullName(lang, '_')}.empty()`;
+        }
+
+        return this._type.getEmpty(lang);
     }
 
     getRead(lang) {

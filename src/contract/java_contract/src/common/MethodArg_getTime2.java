@@ -1,15 +1,15 @@
 
         package common;
-        public class getTime2_Arg {
+        public class MethodArg_getTime2 {
             
             public final int www;
 
-            public getTime2_Arg(){
+            public MethodArg_getTime2(){
                 
                 this.www=0;
             }
 
-            public getTime2_Arg(int www){
+            public MethodArg_getTime2(int www){
                 
                 this.www=www;
             }

@@ -12,14 +12,6 @@ class ODT {
     getEmpty(lang) {
         return this[`getEmpty_${lang}`]();
     }
-
-    getRead(lang) {
-        return this[`getRead_${lang}`]();
-    }
-
-    getWrite(lang) {
-        return this[`getWrite_${lang}`]();
-    }
 }
 
 class ODTBool extends ODT {
@@ -32,6 +24,14 @@ class ODTBool extends ODT {
     }
 
     getEmpty_JAVA() {
+        return 'false';
+    }
+
+    getName_JS() {
+        return 'boolean';
+    }
+
+    getEmpty_JS() {
         return 'false';
     }
 }
@@ -48,6 +48,14 @@ class ODTByte extends ODT {
     getEmpty_JAVA() {
         return '0';
     }
+
+    getName_JS() {
+        return 'byte';
+    }
+
+    getEmpty_JS() {
+        return '0';
+    }
 }
 
 class ODTShort extends ODT {
@@ -60,6 +68,14 @@ class ODTShort extends ODT {
     }
 
     getEmpty_JAVA() {
+        return '0';
+    }
+
+    getName_JS() {
+        return 'short';
+    }
+
+    getEmpty_JS() {
         return '0';
     }
 }
@@ -76,6 +92,14 @@ class ODTInt extends ODT {
     getEmpty_JAVA() {
         return '0';
     }
+
+    getName_JS() {
+        return 'int';
+    }
+
+    getEmpty_JS() {
+        return '0';
+    }
 }
 
 class ODTDate extends ODT {
@@ -90,6 +114,14 @@ class ODTDate extends ODT {
     getEmpty_JAVA() {
         return 'new Date()';
     }
+
+    getName_JS() {
+        return 'Date';
+    }
+
+    getEmpty_JS() {
+        return 'new Date()';
+    }
 }
 
 class ODTString extends ODT {
@@ -102,6 +134,14 @@ class ODTString extends ODT {
     }
 
     getEmpty_JAVA() {
+        return '""';
+    }
+
+    getName_JS() {
+        return 'string';
+    }
+
+    getEmpty_JS() {
         return '""';
     }
 }

@@ -103,16 +103,16 @@ function initNodes(nodes) {
 
         if (node.nodeType == NODE.TYPE) {
             node.fields.forEach(field=> {
-                initTypeRef(currentNS, field.typeRef, `${node.name}_${firstCharUpper(field.name)}`, nodes);
+                initTypeRef(currentNS, field.typeRef, `FD_${node.name}_${firstCharUpper(field.name)}`, nodes);
             });
         }
 
         if (node.nodeType == NODE.METHOD) {
             if (node.argTypeRef) {
-                initTypeRef(currentNS, node.argTypeRef, `${node.name}_Arg`, nodes);
+                initTypeRef(currentNS, node.argTypeRef, `METHOD_ARG_${node.name}`, nodes);
             }
             if (node.retTypeRef) {
-                initTypeRef(currentNS, node.retTypeRef, `${node.name}_Ret`, nodes);
+                initTypeRef(currentNS, node.retTypeRef, `METHOD_RET_${node.name}`, nodes);
             }
         }
     });

@@ -82,8 +82,8 @@
                 
                 readString(),
                 readBooleanArray(),
-                readUserInfo_Aa2(),
-                readUserInfo_SssArray()
+                readFD_UserInfo_Aa2(),
+                readFD_UserInfo_SssArray()
                 );
             }
             public common.UserInfo[] readUserInfoArray(){
@@ -126,96 +126,144 @@
                 return array;
             }
 
-            public common.UserInfo_Aa2 readUserInfo_Aa2(){
-                return new common.UserInfo_Aa2(
+            public common.FD_UserInfo_Aa2 readFD_UserInfo_Aa2(){
+                return new common.FD_UserInfo_Aa2(
                 
                 readInt(),
                 readInt()
                 );
             }
-            public common.UserInfo_Aa2[] readUserInfo_Aa2Array(){
+            public common.FD_UserInfo_Aa2[] readFD_UserInfo_Aa2Array(){
                 int length=readInt();
-                common.UserInfo_Aa2[] array=new common.UserInfo_Aa2[length];
+                common.FD_UserInfo_Aa2[] array=new common.FD_UserInfo_Aa2[length];
                 for(int i=0;i<length;i++){
-                    array[i]=readUserInfo_Aa2();
+                    array[i]=readFD_UserInfo_Aa2();
                 }
                 return array;
             }
 
-            public common.UserInfo_Sss readUserInfo_Sss(){
-                return new common.UserInfo_Sss(
+            public common.FD_UserInfo_Sss readFD_UserInfo_Sss(){
+                return new common.FD_UserInfo_Sss(
                 
                 readInt(),
                 readString()
                 );
             }
-            public common.UserInfo_Sss[] readUserInfo_SssArray(){
+            public common.FD_UserInfo_Sss[] readFD_UserInfo_SssArray(){
                 int length=readInt();
-                common.UserInfo_Sss[] array=new common.UserInfo_Sss[length];
+                common.FD_UserInfo_Sss[] array=new common.FD_UserInfo_Sss[length];
                 for(int i=0;i<length;i++){
-                    array[i]=readUserInfo_Sss();
+                    array[i]=readFD_UserInfo_Sss();
                 }
                 return array;
             }
 
-            public common.getTime2_Arg readGetTime2_Arg(){
-                return new common.getTime2_Arg(
+            public common.METHOD_ARG_getTime2 readMETHOD_ARG_getTime2(){
+                return new common.METHOD_ARG_getTime2(
                 
                 readInt()
                 );
             }
-            public common.getTime2_Arg[] readGetTime2_ArgArray(){
+            public common.METHOD_ARG_getTime2[] readMETHOD_ARG_getTime2Array(){
                 int length=readInt();
-                common.getTime2_Arg[] array=new common.getTime2_Arg[length];
+                common.METHOD_ARG_getTime2[] array=new common.METHOD_ARG_getTime2[length];
                 for(int i=0;i<length;i++){
-                    array[i]=readGetTime2_Arg();
+                    array[i]=readMETHOD_ARG_getTime2();
                 }
                 return array;
             }
 
-            public common.getTime2_Ret readGetTime2_Ret(){
-                return new common.getTime2_Ret(
+            public common.METHOD_RET_getTime2 readMETHOD_RET_getTime2(){
+                return new common.METHOD_RET_getTime2(
                 
                 readString()
                 );
             }
-            public common.getTime2_Ret[] readGetTime2_RetArray(){
+            public common.METHOD_RET_getTime2[] readMETHOD_RET_getTime2Array(){
                 int length=readInt();
-                common.getTime2_Ret[] array=new common.getTime2_Ret[length];
+                common.METHOD_RET_getTime2[] array=new common.METHOD_RET_getTime2[length];
                 for(int i=0;i<length;i++){
-                    array[i]=readGetTime2_Ret();
+                    array[i]=readMETHOD_RET_getTime2();
                 }
                 return array;
             }
 
-            public common.getTime3_Arg readGetTime3_Arg(){
-                return new common.getTime3_Arg(
+            public aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa readMETHOD_RET_getAAAAAAAAAa(){
+                return new aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa(
+                
+                readInt(),
+                readString()
+                );
+            }
+            public aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa[] readMETHOD_RET_getAAAAAAAAAaArray(){
+                int length=readInt();
+                aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa[] array=new aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa[length];
+                for(int i=0;i<length;i++){
+                    array[i]=readMETHOD_RET_getAAAAAAAAAa();
+                }
+                return array;
+            }
+
+            public aaaaaaaaaa.METHOD_ARG_getTime3 readMETHOD_ARG_getTime3(){
+                return new aaaaaaaaaa.METHOD_ARG_getTime3(
                 
                 readInt(),
                 readStringArray()
                 );
             }
-            public common.getTime3_Arg[] readGetTime3_ArgArray(){
+            public aaaaaaaaaa.METHOD_ARG_getTime3[] readMETHOD_ARG_getTime3Array(){
                 int length=readInt();
-                common.getTime3_Arg[] array=new common.getTime3_Arg[length];
+                aaaaaaaaaa.METHOD_ARG_getTime3[] array=new aaaaaaaaaa.METHOD_ARG_getTime3[length];
                 for(int i=0;i<length;i++){
-                    array[i]=readGetTime3_Arg();
+                    array[i]=readMETHOD_ARG_getTime3();
                 }
                 return array;
             }
 
-            public common.getTime3_Ret readGetTime3_Ret(){
-                return new common.getTime3_Ret(
+            public aaaaaaaaaa.METHOD_RET_getTime3 readMETHOD_RET_getTime3(){
+                return new aaaaaaaaaa.METHOD_RET_getTime3(
                 
                 readInt(),
                 readString()
                 );
             }
-            public common.getTime3_Ret[] readGetTime3_RetArray(){
+            public aaaaaaaaaa.METHOD_RET_getTime3[] readMETHOD_RET_getTime3Array(){
                 int length=readInt();
-                common.getTime3_Ret[] array=new common.getTime3_Ret[length];
+                aaaaaaaaaa.METHOD_RET_getTime3[] array=new aaaaaaaaaa.METHOD_RET_getTime3[length];
                 for(int i=0;i<length;i++){
-                    array[i]=readGetTime3_Ret();
+                    array[i]=readMETHOD_RET_getTime3();
+                }
+                return array;
+            }
+
+            public aaaaaaaaaa.METHOD_ARG_fillPlayers readMETHOD_ARG_fillPlayers(){
+                return new aaaaaaaaaa.METHOD_ARG_fillPlayers(
+                
+                readInt(),
+                readStringArray()
+                );
+            }
+            public aaaaaaaaaa.METHOD_ARG_fillPlayers[] readMETHOD_ARG_fillPlayersArray(){
+                int length=readInt();
+                aaaaaaaaaa.METHOD_ARG_fillPlayers[] array=new aaaaaaaaaa.METHOD_ARG_fillPlayers[length];
+                for(int i=0;i<length;i++){
+                    array[i]=readMETHOD_ARG_fillPlayers();
+                }
+                return array;
+            }
+
+            public aaaaaaaaaa.METHOD_RET_fillPlayers readMETHOD_RET_fillPlayers(){
+                return new aaaaaaaaaa.METHOD_RET_fillPlayers(
+                
+                readInt(),
+                readString()
+                );
+            }
+            public aaaaaaaaaa.METHOD_RET_fillPlayers[] readMETHOD_RET_fillPlayersArray(){
+                int length=readInt();
+                aaaaaaaaaa.METHOD_RET_fillPlayers[] array=new aaaaaaaaaa.METHOD_RET_fillPlayers[length];
+                for(int i=0;i<length;i++){
+                    array[i]=readMETHOD_RET_fillPlayers();
                 }
                 return array;
             }

@@ -6,9 +6,9 @@
 
             public final boolean[] name;
 
-            public final common.UserInfo_Aa2 aa2;
+            public final common.FD_UserInfo_Aa2 aa2;
 
-            public final common.UserInfo_Sss[] sss;
+            public final common.FD_UserInfo_Sss[] sss;
 
             public UserInfo(){
                 
@@ -16,12 +16,12 @@
 
                 this.name=new boolean[]{};
 
-                this.aa2=new common.UserInfo_Aa2();
+                this.aa2=new common.FD_UserInfo_Aa2();
 
-                this.sss=new common.UserInfo_Sss[]{};
+                this.sss=new common.FD_UserInfo_Sss[]{};
             }
 
-            public UserInfo(String aa, boolean[] name, common.UserInfo_Aa2 aa2, common.UserInfo_Sss[] sss){
+            public UserInfo(String aa, boolean[] name, common.FD_UserInfo_Aa2 aa2, common.FD_UserInfo_Sss[] sss){
                 
                 this.aa=aa;
 

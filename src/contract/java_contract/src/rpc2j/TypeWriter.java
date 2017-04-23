@@ -71,9 +71,9 @@
 
                 writeBooleanArray(value.name);
 
-                writeUserInfo_Aa2(value.aa2);
+                writeFD_UserInfo_Aa2(value.aa2);
 
-                writeUserInfo_SssArray(value.sss);
+                writeFD_UserInfo_SssArray(value.sss);
             }
             public void writeUserInfoArray(common.UserInfo[] array){
                 int length=array.length;
@@ -109,83 +109,125 @@
                 }                
             }
 
-            public void writeUserInfo_Aa2(common.UserInfo_Aa2 value){
+            public void writeFD_UserInfo_Aa2(common.FD_UserInfo_Aa2 value){
                 
                 writeInt(value.abc);
 
                 writeInt(value.test);
             }
-            public void writeUserInfo_Aa2Array(common.UserInfo_Aa2[] array){
+            public void writeFD_UserInfo_Aa2Array(common.FD_UserInfo_Aa2[] array){
                 int length=array.length;
                 writeInt(length);
                 for(int i=0;i<length;i++){
-                    writeUserInfo_Aa2(array[i]);
+                    writeFD_UserInfo_Aa2(array[i]);
                 }                
             }
 
-            public void writeUserInfo_Sss(common.UserInfo_Sss value){
+            public void writeFD_UserInfo_Sss(common.FD_UserInfo_Sss value){
                 
                 writeInt(value.sss);
 
                 writeString(value.cbd);
             }
-            public void writeUserInfo_SssArray(common.UserInfo_Sss[] array){
+            public void writeFD_UserInfo_SssArray(common.FD_UserInfo_Sss[] array){
                 int length=array.length;
                 writeInt(length);
                 for(int i=0;i<length;i++){
-                    writeUserInfo_Sss(array[i]);
+                    writeFD_UserInfo_Sss(array[i]);
                 }                
             }
 
-            public void writeGetTime2_Arg(common.getTime2_Arg value){
+            public void writeMETHOD_ARG_getTime2(common.METHOD_ARG_getTime2 value){
                 
                 writeInt(value.www);
             }
-            public void writeGetTime2_ArgArray(common.getTime2_Arg[] array){
+            public void writeMETHOD_ARG_getTime2Array(common.METHOD_ARG_getTime2[] array){
                 int length=array.length;
                 writeInt(length);
                 for(int i=0;i<length;i++){
-                    writeGetTime2_Arg(array[i]);
+                    writeMETHOD_ARG_getTime2(array[i]);
                 }                
             }
 
-            public void writeGetTime2_Ret(common.getTime2_Ret value){
+            public void writeMETHOD_RET_getTime2(common.METHOD_RET_getTime2 value){
                 
                 writeString(value.sss);
             }
-            public void writeGetTime2_RetArray(common.getTime2_Ret[] array){
+            public void writeMETHOD_RET_getTime2Array(common.METHOD_RET_getTime2[] array){
                 int length=array.length;
                 writeInt(length);
                 for(int i=0;i<length;i++){
-                    writeGetTime2_Ret(array[i]);
+                    writeMETHOD_RET_getTime2(array[i]);
                 }                
             }
 
-            public void writeGetTime3_Arg(common.getTime3_Arg value){
-                
-                writeInt(value.name);
-
-                writeStringArray(value.sss);
-            }
-            public void writeGetTime3_ArgArray(common.getTime3_Arg[] array){
-                int length=array.length;
-                writeInt(length);
-                for(int i=0;i<length;i++){
-                    writeGetTime3_Arg(array[i]);
-                }                
-            }
-
-            public void writeGetTime3_Ret(common.getTime3_Ret value){
+            public void writeMETHOD_RET_getAAAAAAAAAa(aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa value){
                 
                 writeInt(value.abc);
 
                 writeString(value.sss);
             }
-            public void writeGetTime3_RetArray(common.getTime3_Ret[] array){
+            public void writeMETHOD_RET_getAAAAAAAAAaArray(aaaaaaaaaa.METHOD_RET_getAAAAAAAAAa[] array){
                 int length=array.length;
                 writeInt(length);
                 for(int i=0;i<length;i++){
-                    writeGetTime3_Ret(array[i]);
+                    writeMETHOD_RET_getAAAAAAAAAa(array[i]);
+                }                
+            }
+
+            public void writeMETHOD_ARG_getTime3(aaaaaaaaaa.METHOD_ARG_getTime3 value){
+                
+                writeInt(value.name);
+
+                writeStringArray(value.sss);
+            }
+            public void writeMETHOD_ARG_getTime3Array(aaaaaaaaaa.METHOD_ARG_getTime3[] array){
+                int length=array.length;
+                writeInt(length);
+                for(int i=0;i<length;i++){
+                    writeMETHOD_ARG_getTime3(array[i]);
+                }                
+            }
+
+            public void writeMETHOD_RET_getTime3(aaaaaaaaaa.METHOD_RET_getTime3 value){
+                
+                writeInt(value.abc);
+
+                writeString(value.sss);
+            }
+            public void writeMETHOD_RET_getTime3Array(aaaaaaaaaa.METHOD_RET_getTime3[] array){
+                int length=array.length;
+                writeInt(length);
+                for(int i=0;i<length;i++){
+                    writeMETHOD_RET_getTime3(array[i]);
+                }                
+            }
+
+            public void writeMETHOD_ARG_fillPlayers(aaaaaaaaaa.METHOD_ARG_fillPlayers value){
+                
+                writeInt(value.name);
+
+                writeStringArray(value.sss);
+            }
+            public void writeMETHOD_ARG_fillPlayersArray(aaaaaaaaaa.METHOD_ARG_fillPlayers[] array){
+                int length=array.length;
+                writeInt(length);
+                for(int i=0;i<length;i++){
+                    writeMETHOD_ARG_fillPlayers(array[i]);
+                }                
+            }
+
+            public void writeMETHOD_RET_fillPlayers(aaaaaaaaaa.METHOD_RET_fillPlayers value){
+                
+                writeInt(value.abc);
+
+                writeString(value.sss);
+            }
+            public void writeMETHOD_RET_fillPlayersArray(aaaaaaaaaa.METHOD_RET_fillPlayers[] array){
+                int length=array.length;
+                writeInt(length);
+                for(int i=0;i<length;i++){
+                    writeMETHOD_RET_fillPlayers(array[i]);
                 }                
             }
         }

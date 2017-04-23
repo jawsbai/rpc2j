@@ -1,6 +1,6 @@
 
 (gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\src\contract\java_contract\src)
-(sgen JS     client C:\Users\admin\Desktop\github\rpc2j\test\js\)
+(gen JS     client C:\Users\admin\Desktop\github\rpc2j\test\rpc2j.es6)
 
 (include a.d)
 
@@ -14,12 +14,16 @@
 
 (type UserInfo334 ss:[int])
 
-(method server UserInfo33 [UserInfo] [common.UserInfo])
+(method server getSSS [UserInfo] [])
 
-(method server getTime1 [UserInfo] [common.UserInfo])
+(method server getTime1 [] [int])
 (method server getTime4 [UserInfo] [common.UserInfo])
 (method server getTime2 [{www:int}] {sss:String})
+
+(ns aaaaaaaaaa)
+(method server getAAAAAAAAAa int {abc:int sss:string})
 (method client getTime3 [{name:int sss:[string]}] {abc:int sss:string})
+(method client fillPlayers [{name:int sss:[string]}] {abc:int sss:string})
 
 
 (ns WWW)

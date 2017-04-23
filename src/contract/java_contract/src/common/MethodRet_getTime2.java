@@ -1,15 +1,15 @@
 
         package common;
-        public class getTime2_Ret {
+        public class MethodRet_getTime2 {
             
             public final String sss;
 
-            public getTime2_Ret(){
+            public MethodRet_getTime2(){
                 
                 this.sss="";
             }
 
-            public getTime2_Ret(String sss){
+            public MethodRet_getTime2(String sss){
                 
                 this.sss=sss;
             }

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<script src="ByteArrayWriter.es6"></script>
+<script src="ByteArrayReader.es6"></script>
+<script>
+    var bytes = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    bytes.fill([100, 10], 0, 10);
+    //    console.log(bytes);
+
+    var writer = new ByteArrayWriter();
+    writer.writeInt(123);
+    writer.writeString('我试试111');
+
+    console.log(writer.toArray());
+
+    var reader = new ByteArrayReader(writer.toArray());
+    console.log(reader.readInt());
+    console.log(reader.readString());
+</script>
+</body>
+</html>
