@@ -4,7 +4,7 @@
 
 
         export class Message{
-            constructor(type, messageID,time, methodID){
+            constructor(type, messageID, time, methodID){
                 this._type=type;
                 this._messageID=messageID;
                 this._time=time;
@@ -21,15 +21,15 @@
                     reader.readByte(),
                     reader.readInt(),
                     reader.readDate(),
-                    reader.methodID()
-                )
+                    reader.readInt()
+                );
             }
             
-            static write(writer){
-                writer.writeByte(this._type);
-                writer.writeInt(this._messageID);
-                writer.writeDate(this._time);
-                writer.writeInt(this._methodID);
+            static write(writer, message){
+                writer.writeByte(message.type);
+                writer.writeInt(message.messageID);
+                writer.writeDate(message.time);
+                writer.writeInt(message.methodID);
             }
                 
             static newRequest(messageID, methodID){
@@ -112,7 +112,7 @@
                 getSSS(value){
                     var writer=new TypeWriter();
                     var message=Message.newRequest(this._newMessageID(), 0);
-                    message.write(writer);
+                    Message.write(writer, message);
                     writer.writeUserInfoArray(value);
                     return this._sendMessage(writer, message);
                 }
@@ -126,7 +126,7 @@
                 getTime1(){
                     var writer=new TypeWriter();
                     var message=Message.newRequest(this._newMessageID(), 1);
-                    message.write(writer);
+                    Message.write(writer, message);
                     
                     return this._sendMessage(writer, message)
                         .then((r, m)=>{
@@ -143,7 +143,7 @@
                 getTime4(value){
                     var writer=new TypeWriter();
                     var message=Message.newRequest(this._newMessageID(), 2);
-                    message.write(writer);
+                    Message.write(writer, message);
                     writer.writeUserInfoArray(value);
                     return this._sendMessage(writer, message)
                         .then((r, m)=>{
@@ -160,7 +160,7 @@
                 getTime2(value){
                     var writer=new TypeWriter();
                     var message=Message.newRequest(this._newMessageID(), 3);
-                    message.write(writer);
+                    Message.write(writer, message);
                     writer.writeMETHOD_ARG_getTime2Array(value);
                     return this._sendMessage(writer, message)
                         .then((r, m)=>{
@@ -185,7 +185,7 @@
                 getAAAAAAAAAa(value){
                     var writer=new TypeWriter();
                     var message=Message.newRequest(this._newMessageID(), 0);
-                    message.write(writer);
+                    Message.write(writer, message);
                     writer.writeInt(value);
                     return this._sendMessage(writer, message)
                         .then((r, m)=>{
@@ -207,17 +207,17 @@
                         this.getTime3(reader.readMETHOD_ARG_getTime3Array())
                             .then(ret=>{
                                 var writer=new TypeWriter();
-                                var message=Message.newResponse(this._newMessageID(), message.messageID);
-                                message.write(writer);
+                                var message2=Message.newResponse(this._newMessageID(), message.messageID);
+                                Message.write(writer, message2);
                                 writer.writeMETHOD_RET_getTime3(ret);
-                                this._sendMessage(writer, message);
+                                this._sendMessage(writer, message2);
                             })
                             .catch(error=>{
                                 var writer=new TypeWriter();
-                                var message=Message.newResponseError(this._newMessageID(), messageID);
-                                message.write(writer);
-                                writer.writeString((error || '').toString());
-                                this._sendMessage(writer);                                
+                                var message2=Message.newResponseError(this._newMessageID(), message.messageID);
+                                Message.write(writer, message2);
+                                writer.writeString(error.toString());
+                                this._sendMessage(writer, message2);                                
                             });
                     }
                 else
@@ -225,17 +225,17 @@
                         this.fillPlayers(reader.readMETHOD_ARG_fillPlayersArray())
                             .then(ret=>{
                                 var writer=new TypeWriter();
-                                var message=Message.newResponse(this._newMessageID(), message.messageID);
-                                message.write(writer);
+                                var message2=Message.newResponse(this._newMessageID(), message.messageID);
+                                Message.write(writer, message2);
                                 writer.writeMETHOD_RET_fillPlayers(ret);
-                                this._sendMessage(writer, message);
+                                this._sendMessage(writer, message2);
                             })
                             .catch(error=>{
                                 var writer=new TypeWriter();
-                                var message=Message.newResponseError(this._newMessageID(), messageID);
-                                message.write(writer);
-                                writer.writeString((error || '').toString());
-                                this._sendMessage(writer);                                
+                                var message2=Message.newResponseError(this._newMessageID(), message.messageID);
+                                Message.write(writer, message2);
+                                writer.writeString(error.toString());
+                                this._sendMessage(writer, message2);                                
                             });
                     }
                 else

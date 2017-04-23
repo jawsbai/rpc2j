@@ -168,7 +168,7 @@ class GenJS extends Gen {
     _makeMessage() {
         return new CodeFile(GEN.RPC2J, GEN.MESSAGE).append(`
         export class ${GEN.MESSAGE}{
-            constructor(type, messageID,time, methodID){
+            constructor(type, messageID, time, methodID){
                 this._type=type;
                 this._messageID=messageID;
                 this._time=time;
@@ -185,15 +185,15 @@ class GenJS extends Gen {
                     reader.readByte(),
                     reader.readInt(),
                     reader.readDate(),
-                    reader.methodID()
-                )
+                    reader.readInt()
+                );
             }
             
-            static write(writer){
-                writer.writeByte(this._type);
-                writer.writeInt(this._messageID);
-                writer.writeDate(this._time);
-                writer.writeInt(this._methodID);
+            static write(writer, message){
+                writer.writeByte(message.type);
+                writer.writeInt(message.messageID);
+                writer.writeDate(message.time);
+                writer.writeInt(message.methodID);
             }
                 
             static newRequest(messageID, methodID){
@@ -284,7 +284,7 @@ class GenJS extends Gen {
                 ${m.name}(${a ? 'value' : ''}){
                     var writer=new ${GEN.TYPE_WRITER}();
                     var message=${GEN.MESSAGE}.newRequest(this._newMessageID(), ${i});
-                    message.write(writer);
+                    ${GEN.MESSAGE}.write(writer, message);
                     ${a ? `writer.${at.getWrite(this.lang)}(value);` : ''}
                     return this._sendMessage(writer, message)${r ? `
                         .then((r, m)=>{
@@ -308,17 +308,17 @@ class GenJS extends Gen {
                         this.${m.name}(${a ? `reader.${at.getRead(this.lang)}()` : ''})${r ? `
                             .then(ret=>{
                                 var writer=new ${GEN.TYPE_WRITER}();
-                                var message=${GEN.MESSAGE}.newResponse(this._newMessageID(), message.messageID);
-                                message.write(writer);
+                                var message2=${GEN.MESSAGE}.newResponse(this._newMessageID(), message.messageID);
+                                ${GEN.MESSAGE}.write(writer, message2);
                                 writer.${rt.getWrite(this.lang)}(ret);
-                                this._sendMessage(writer, message);
+                                this._sendMessage(writer, message2);
                             })
                             .catch(error=>{
                                 var writer=new ${GEN.TYPE_WRITER}();
-                                var message=${GEN.MESSAGE}.newResponseError(this._newMessageID(), messageID);
-                                message.write(writer);
-                                writer.writeString((error || '').toString());
-                                this._sendMessage(writer);                                
+                                var message2=${GEN.MESSAGE}.newResponseError(this._newMessageID(), message.messageID);
+                                ${GEN.MESSAGE}.write(writer, message2);
+                                writer.writeString(error.toString());
+                                this._sendMessage(writer, message2);                                
                             })` : ''};
                     }
                 `).join('else')}
