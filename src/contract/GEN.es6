@@ -6,6 +6,6 @@ module.exports = {
     TYPE_WRITER: 'TypeWriter',
     END_REMOTE: 'EndRemote',
     END_LOCAL: 'EndLocal',
-    MESSAGE_READER:'MessageReader',
-    MESSAGE_WRITER:'MessageWriter'
+    RECEIVER: 'Receiver',
+    MESSAGE:'Message'
 };

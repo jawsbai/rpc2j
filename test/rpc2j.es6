@@ -1,6 +1,67 @@
 
-        import q from 'q';
+        import Q from 'q';
         
+
+
+        export class Message{
+            constructor(type, messageID,time, methodID){
+                this._type=type;
+                this._messageID=messageID;
+                this._time=time;
+                this._methodID=methodID;
+            }
+            
+            get type(){return this._type;}
+            get messageID(){return this._messageID;}
+            get time(){return this._time;}
+            get methodID(){return this._methodID;}
+            
+            static read(reader){
+                return new Message(
+                    reader.readByte(),
+                    reader.readInt(),
+                    reader.readDate(),
+                    reader.methodID()
+                )
+            }
+            
+            static write(writer){
+                writer.writeByte(this._type);
+                writer.writeInt(this._messageID);
+                writer.writeDate(this._time);
+                writer.writeInt(this._methodID);
+            }
+                
+            static newRequest(messageID, methodID){
+                return new Message(1, messageID, new Date(), methodID);
+            }
+            
+            static newResponse(messageID, responseID){
+                return new Message(2, messageID, new Date(), responseID);
+            }
+            
+            static newResponseError(messageID, responseID){
+                return new Message(3, messageID, new Date(), responseID);
+            }
+        }
+
+
+        export class Receiver {
+            constructor(remote, local) {
+                this._remote=remote;
+                this._local=local;
+            }
+            
+            receive(bytes){
+                var reader=new TypeReader(bytes);
+                var message=Message.read(reader);
+                if(message.type==1 || message.type==3){
+                    this._remote._handle(reader, message);
+                }else if(message.type==2){
+                    this._local._handle(reader, message);
+                }
+            }
+        }
 
 
         export class EndRemote {
@@ -11,19 +72,10 @@
                 return 0;
             }
         
-            _newRequestMessage(methodID) {
-                var messageWriter=new MessageWriter();
-                messageWriter.writeByte(0);
-                messageWriter.writeInt(this._newMessageID());
-                messageWriter.writeDate(new Date());
-                messageWriter.writeInt(methodID);
-                return messageWriter;
-            }
-        
-            _sendMessage(messageWriter) {
+            _sendMessage(writer, message) {
             }
             
-            receive(bytes){
+            _handle(reader, message){
             }
         }
 
@@ -32,21 +84,16 @@
             constructor() {
         
             }
-            
-            _newResponseMessage(responseMessageID){
-                var messageWriter=new MessageWriter();
-                messageWriter.writeByte(1);
-                messageWriter.writeInt(this._newMessageID());
-                messageWriter.writeDate(new Date());
-                messageWriter.writeInt(responseMessageID);
-                return messageWriter;
+        
+            _newMessageID() {
+                return 0;
             }
         
-            _sendMessage(messageWriter) {
+            _sendMessage(writer, message) {
             }
             
-            receive(bytes){
-                var messageReader=new MessageReader();
+            
+            _handle(reader, message){
             }
         }
 
@@ -63,9 +110,11 @@
                 
                 */
                 getSSS(value){
-                    var messageWriter=this._newRequestMessage(0);
-                    messageWriter.writeUserInfoArray(value);
-                    return this._sendMessage(messageWriter);
+                    var writer=new TypeWriter();
+                    var message=Message.newRequest(this._newMessageID(), 0);
+                    message.write(writer);
+                    writer.writeUserInfoArray(value);
+                    return this._sendMessage(writer, message);
                 }
             
 
@@ -75,11 +124,13 @@
                 * @return {q<[int]>}
                 */
                 getTime1(){
-                    var messageWriter=this._newRequestMessage(1);
+                    var writer=new TypeWriter();
+                    var message=Message.newRequest(this._newMessageID(), 1);
+                    message.write(writer);
                     
-                    return this._sendMessage(messageWriter)
-                        .then(messageReader=>{
-                            return messageReader.readIntArray();
+                    return this._sendMessage(writer, message)
+                        .then((r, m)=>{
+                            return r.readIntArray();
                         });
                 }
             
@@ -90,11 +141,13 @@
                 * @return {q<[common_UserInfo]>}
                 */
                 getTime4(value){
-                    var messageWriter=this._newRequestMessage(2);
-                    messageWriter.writeUserInfoArray(value);
-                    return this._sendMessage(messageWriter)
-                        .then(messageReader=>{
-                            return messageReader.readUserInfoArray();
+                    var writer=new TypeWriter();
+                    var message=Message.newRequest(this._newMessageID(), 2);
+                    message.write(writer);
+                    writer.writeUserInfoArray(value);
+                    return this._sendMessage(writer, message)
+                        .then((r, m)=>{
+                            return r.readUserInfoArray();
                         });
                 }
             
@@ -105,11 +158,13 @@
                 * @return {q<common_METHOD_RET_getTime2>}
                 */
                 getTime2(value){
-                    var messageWriter=this._newRequestMessage(3);
-                    messageWriter.writeMETHOD_ARG_getTime2Array(value);
-                    return this._sendMessage(messageWriter)
-                        .then(messageReader=>{
-                            return messageReader.readMETHOD_RET_getTime2();
+                    var writer=new TypeWriter();
+                    var message=Message.newRequest(this._newMessageID(), 3);
+                    message.write(writer);
+                    writer.writeMETHOD_ARG_getTime2Array(value);
+                    return this._sendMessage(writer, message)
+                        .then((r, m)=>{
+                            return r.readMETHOD_RET_getTime2();
                         });
                 }
             
@@ -128,11 +183,13 @@
                 * @return {q<aaaaaaaaaa_METHOD_RET_getAAAAAAAAAa>}
                 */
                 getAAAAAAAAAa(value){
-                    var messageWriter=this._newRequestMessage(0);
-                    messageWriter.writeInt(value);
-                    return this._sendMessage(messageWriter)
-                        .then(messageReader=>{
-                            return messageReader.readMETHOD_RET_getAAAAAAAAAa();
+                    var writer=new TypeWriter();
+                    var message=Message.newRequest(this._newMessageID(), 0);
+                    message.write(writer);
+                    writer.writeInt(value);
+                    return this._sendMessage(writer, message)
+                        .then((r, m)=>{
+                            return r.readMETHOD_RET_getAAAAAAAAAa();
                         });
                 }
             
@@ -144,32 +201,46 @@
                 super();
             }
             
-            _handle(bytes){
-                var messageReader=new MessageReader(bytes);
-                var methodID=messageReader.readInt();
-                var messageID=messageReader.readInt();
-                var time=messageReader.readDate();
+            _handle(reader, message){
                 
-                    if(methodID==0){
-                        this.getTime3(messageReader.readMETHOD_ARG_getTime3Array())
+                    if(message.methodID==0){
+                        this.getTime3(reader.readMETHOD_ARG_getTime3Array())
                             .then(ret=>{
-                                var messageWriter=this._newResponseMessage();
-                                messageWriter.writeMETHOD_RET_getTime3(ret);
-                                this._sendMessage(messageWriter);
-                            }).catch(e=>{
-                                
+                                var writer=new TypeWriter();
+                                var message=Message.newResponse(this._newMessageID(), message.messageID);
+                                message.write(writer);
+                                writer.writeMETHOD_RET_getTime3(ret);
+                                this._sendMessage(writer, message);
+                            })
+                            .catch(error=>{
+                                var writer=new TypeWriter();
+                                var message=Message.newResponseError(this._newMessageID(), messageID);
+                                message.write(writer);
+                                writer.writeString((error || '').toString());
+                                this._sendMessage(writer);                                
                             });
                     }
                 else
-                    if(methodID==1){
-                        this.fillPlayers(messageReader.readMETHOD_ARG_fillPlayersArray())
+                    if(message.methodID==1){
+                        this.fillPlayers(reader.readMETHOD_ARG_fillPlayersArray())
                             .then(ret=>{
-                                var messageWriter=this._newResponseMessage();
-                                messageWriter.writeMETHOD_RET_fillPlayers(ret);
-                                this._sendMessage(messageWriter);
-                            }).catch(e=>{
-                                
+                                var writer=new TypeWriter();
+                                var message=Message.newResponse(this._newMessageID(), message.messageID);
+                                message.write(writer);
+                                writer.writeMETHOD_RET_fillPlayers(ret);
+                                this._sendMessage(writer, message);
+                            })
+                            .catch(error=>{
+                                var writer=new TypeWriter();
+                                var message=Message.newResponseError(this._newMessageID(), messageID);
+                                message.write(writer);
+                                writer.writeString((error || '').toString());
+                                this._sendMessage(writer);                                
                             });
+                    }
+                else
+                    if(message.methodID==2){
+                        this.FFFFFK();
                     }
                 
             }
@@ -190,6 +261,15 @@
                 * @return {q<aaaaaaaaaa_METHOD_RET_fillPlayers>}
                 */
                 fillPlayers(value){
+                }
+            
+
+                /**
+                *
+                
+                
+                */
+                FFFFFK(){
                 }
             
         }
@@ -1181,21 +1261,6 @@ export class ByteArrayWriter {
                 for(var i=0;i<length;i++){
                     this.writeMETHOD_RET_fillPlayers(array[i]);
                 }                
-            }
-        }
-
-
-        export class MessageWriter extends TypeWriter {
-        }
-
-
-        export class MessageReader extends TypeReader {
-            /**
-             *
-             * @param {Uint8Array} bytes
-             */
-            constructor(bytes){
-                super(bytes);
             }
         }
 

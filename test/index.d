@@ -24,6 +24,7 @@
 (method server getAAAAAAAAAa int {abc:int sss:string})
 (method client getTime3 [{name:int sss:[string]}] {abc:int sss:string})
 (method client fillPlayers [{name:int sss:[string]}] {abc:int sss:string})
+(method client FFFFFK)
 
 
 (ns WWW)

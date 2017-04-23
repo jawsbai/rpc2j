@@ -165,6 +165,71 @@ class GenJS extends Gen {
         }`);
     }
 
+    _makeMessage() {
+        return new CodeFile(GEN.RPC2J, GEN.MESSAGE).append(`
+        export class ${GEN.MESSAGE}{
+            constructor(type, messageID,time, methodID){
+                this._type=type;
+                this._messageID=messageID;
+                this._time=time;
+                this._methodID=methodID;
+            }
+            
+            get type(){return this._type;}
+            get messageID(){return this._messageID;}
+            get time(){return this._time;}
+            get methodID(){return this._methodID;}
+            
+            static read(reader){
+                return new ${GEN.MESSAGE}(
+                    reader.readByte(),
+                    reader.readInt(),
+                    reader.readDate(),
+                    reader.methodID()
+                )
+            }
+            
+            static write(writer){
+                writer.writeByte(this._type);
+                writer.writeInt(this._messageID);
+                writer.writeDate(this._time);
+                writer.writeInt(this._methodID);
+            }
+                
+            static newRequest(messageID, methodID){
+                return new ${GEN.MESSAGE}(1, messageID, new Date(), methodID);
+            }
+            
+            static newResponse(messageID, responseID){
+                return new ${GEN.MESSAGE}(2, messageID, new Date(), responseID);
+            }
+            
+            static newResponseError(messageID, responseID){
+                return new ${GEN.MESSAGE}(3, messageID, new Date(), responseID);
+            }
+        }`);
+    }
+
+    _makeReceiver() {
+        return new CodeFile(GEN.RPC2J, GEN.RECEIVER).append(`
+        export class ${GEN.RECEIVER} {
+            constructor(remote, local) {
+                this._remote=remote;
+                this._local=local;
+            }
+            
+            receive(bytes){
+                var reader=new ${GEN.TYPE_READER}(bytes);
+                var message=${GEN.MESSAGE}.read(reader);
+                if(message.type==1 || message.type==3){
+                    this._remote._handle(reader, message);
+                }else if(message.type==2){
+                    this._local._handle(reader, message);
+                }
+            }
+        }`);
+    }
+
     _makeEndRemote() {
         return new CodeFile(GEN.RPC2J, GEN.END_REMOTE).append(`
         export class ${GEN.END_REMOTE} {
@@ -175,19 +240,10 @@ class GenJS extends Gen {
                 return 0;
             }
         
-            _newRequestMessage(methodID) {
-                var messageWriter=new MessageWriter();
-                messageWriter.writeByte(0);
-                messageWriter.writeInt(this._newMessageID());
-                messageWriter.writeDate(new Date());
-                messageWriter.writeInt(methodID);
-                return messageWriter;
-            }
-        
-            _sendMessage(messageWriter) {
+            _sendMessage(writer, message) {
             }
             
-            receive(bytes){
+            _handle(reader, message){
             }
         }`);
     }
@@ -198,35 +254,18 @@ class GenJS extends Gen {
             constructor() {
         
             }
-            
-            _newResponseMessage(responseMessageID){
-                var messageWriter=new MessageWriter();
-                messageWriter.writeByte(1);
-                messageWriter.writeInt(this._newMessageID());
-                messageWriter.writeDate(new Date());
-                messageWriter.writeInt(responseMessageID);
-                return messageWriter;
+        
+            _newMessageID() {
+                return 0;
             }
         
-            _sendMessage(messageWriter) {
+            _sendMessage(writer, message) {
             }
             
-            receive(bytes){
-                var messageReader=new MessageReader();
+            
+            _handle(reader, message){
             }
         }`);
-    }
-
-    _makeRemotes(filter, make) {
-        var dic = this.methodsGroupByNS();
-        var ss = [];
-        for (var key in dic) {
-            var methods = dic[key].filter(filter);
-            if (methods.length) {
-                ss.push(make(key, methods));
-            }
-        }
-        return ss;
     }
 
     _makeEndRemoteByNS(ns, methods) {
@@ -243,11 +282,13 @@ class GenJS extends Gen {
                 ${r ? `* @return {q<${rt.nameTypeExpr2(this.lang)}>}` : ''}
                 */
                 ${m.name}(${a ? 'value' : ''}){
-                    var messageWriter=this._newRequestMessage(${i});
-                    ${a ? `messageWriter.${at.getWrite(this.lang)}(value);` : ''}
-                    return this._sendMessage(messageWriter)${r ? `
-                        .then(messageReader=>{
-                            return messageReader.${rt.getRead(this.lang)}();
+                    var writer=new ${GEN.TYPE_WRITER}();
+                    var message=${GEN.MESSAGE}.newRequest(this._newMessageID(), ${i});
+                    message.write(writer);
+                    ${a ? `writer.${at.getWrite(this.lang)}(value);` : ''}
+                    return this._sendMessage(writer, message)${r ? `
+                        .then((r, m)=>{
+                            return r.${rt.getRead(this.lang)}();
                         })` : ''};
                 }
             `).join('\n')}
@@ -261,20 +302,23 @@ class GenJS extends Gen {
                 super();
             }
             
-            _handle(bytes){
-                var messageReader=new MessageReader(bytes);
-                var methodID=messageReader.readInt();
-                var messageID=messageReader.readInt();
-                var time=messageReader.readDate();
+            _handle(reader, message){
                 ${this.mapMethods(methods, (i, m, a, r, at, rt)=>`
-                    if(methodID==${i}){
-                        this.${m.name}(${a ? `messageReader.${at.getRead(this.lang)}()` : ''})${r ? `
+                    if(message.methodID==${i}){
+                        this.${m.name}(${a ? `reader.${at.getRead(this.lang)}()` : ''})${r ? `
                             .then(ret=>{
-                                var messageWriter=this._newResponseMessage();
-                                messageWriter.${rt.getWrite(this.lang)}(ret);
-                                this._sendMessage(messageWriter);
-                            }).catch(e=>{
-                                
+                                var writer=new ${GEN.TYPE_WRITER}();
+                                var message=${GEN.MESSAGE}.newResponse(this._newMessageID(), message.messageID);
+                                message.write(writer);
+                                writer.${rt.getWrite(this.lang)}(ret);
+                                this._sendMessage(writer, message);
+                            })
+                            .catch(error=>{
+                                var writer=new ${GEN.TYPE_WRITER}();
+                                var message=${GEN.MESSAGE}.newResponseError(this._newMessageID(), messageID);
+                                message.write(writer);
+                                writer.writeString((error || '').toString());
+                                this._sendMessage(writer);                                
                             })` : ''};
                     }
                 `).join('else')}
@@ -292,27 +336,22 @@ class GenJS extends Gen {
         }`);
     }
 
-    _makeMessageReader() {
-        return new CodeFile(GEN.RPC2J, GEN.MESSAGE_READER).append(`
-        export class ${GEN.MESSAGE_READER} extends ${GEN.TYPE_READER} {
-            /**
-             *
-             * @param {Uint8Array} bytes
-             */
-            constructor(bytes){
-                super(bytes);
+    _makeRemotes(filter, make) {
+        var dic = this.methodsGroupByNS();
+        var ss = [];
+        for (var key in dic) {
+            var methods = dic[key].filter(filter);
+            if (methods.length) {
+                ss.push(make(key, methods));
             }
-        }`);
-    }
-
-    _makeMessageWriter() {
-        return new CodeFile(GEN.RPC2J, GEN.MESSAGE_WRITER).append(`
-        export class ${GEN.MESSAGE_WRITER} extends ${GEN.TYPE_WRITER} {
-        }`);
+        }
+        return ss;
     }
 
     make() {
         var codeFiles = [
+            this._makeMessage(),
+            this._makeReceiver(),
             this._makeEndRemote(),
             this._makeEndLocal(),
             ...this._makeRemotes(item=>item.end != this.end, this._makeEndRemoteByNS.bind(this)),
@@ -321,13 +360,11 @@ class GenJS extends Gen {
             this._makeByteArrayWriter(),
             this._makeTypeReader(),
             this._makeTypeWriter(),
-            this._makeMessageWriter(),
-            this._makeMessageReader(),
             ...this._makeTypes()
         ];
 
         var codes = [`
-        import q from 'q';
+        import Q from 'q';
         `];
         codeFiles.forEach(codeFile=> {
             codes.push(codeFile.getCode());
