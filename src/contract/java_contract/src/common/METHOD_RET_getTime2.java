@@ -1,5 +1,6 @@
 
         package common;
+        import java.util.Date;
         public class METHOD_RET_getTime2 {
             
             public final String sss;

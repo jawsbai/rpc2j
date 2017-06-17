@@ -2,6 +2,15 @@
 (gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\src\contract\java_contract\src)
 (gen JS     client C:\Users\admin\Desktop\github\rpc2j\test\rpc2j.es6)
 
+(ns table)
+
+(table Player
+    playerId:STRING[50]
+    userId:STRING[50]
+    online:BOOL
+    createTime:TIME
+    )
+
 (include a.d)
 
 (ns common)

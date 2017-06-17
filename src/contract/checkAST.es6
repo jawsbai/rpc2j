@@ -1,5 +1,6 @@
 var NODE = require('./NODE.es6'),
     odts = require('./odts.es6'),
+    tablefieldTypes = require('./tablefieldTypes.es6'),
     TypeRef = require('./TypeRef.es6'),
     NodeList = require('./NodeList.es6'),
     firstCharUpper = require('./firstCharUpper.es6');
@@ -31,14 +32,14 @@ function checkMethod(nodeList, methodNode) {
     }
 }
 function checkMethods(nodeList) {
-    nodeList.findMethods().forEach(node=>checkMethod(nodeList, node));
+    nodeList.findMethods().forEach(node => checkMethod(nodeList, node));
 }
 
 function findFiled(fields, field) {
-    return fields.filter(item=> item.name == field.name && item != field).length > 0;
+    return fields.filter(item => item.name == field.name && item != field).length > 0;
 }
 function checkType(nodeList, typeNode) {
-    typeNode.fields.forEach(field=> {
+    typeNode.fields.forEach(field => {
         if (findFiled(typeNode.fields, field)) {
             throw new Error(`field:${typeNode.name}.${field.name} cannot duplicate definition.`);
         }
@@ -47,12 +48,24 @@ function checkType(nodeList, typeNode) {
     });
 }
 function checkTypes(nodeList) {
-    nodeList.findTypes().forEach(node=>checkType(nodeList, node));
+    nodeList.findTypes().forEach(node => checkType(nodeList, node));
+}
+
+function checkTable(nodeList, typeNode) {
+    typeNode.fields.forEach(field => {
+        if (!tablefieldTypes[field.type]) {
+            throw new Error(`table field type:${field.type} not found.`);
+        }
+        field.otype = tablefieldTypes[field.type];
+    });
+}
+function checkTables(nodeList) {
+    nodeList.findTables().forEach(node => checkTable(nodeList, node));
 }
 
 function checkNamedNodes(nodeList) {
     var dic = {};
-    nodeList.findNamedNodes().forEach(node=> {
+    nodeList.findNamedNodes().forEach(node => {
         var key = `${node.ns}${node.name}`;
         if (dic[key]) {
             throw new Error(`${node.nodeType}:${node.name} cannot duplicate definition.`);
@@ -78,7 +91,7 @@ function initTypeRef(ns, typeRef, name, nodes) {
     createType.ns = typeRef.ns;
     createType.name = typeRef.name;
 
-    createType.fields.forEach(field=> {
+    createType.fields.forEach(field => {
         if (!field.typeRef.ns) {
             field.typeRef.ns = ns.name;
         }
@@ -88,12 +101,14 @@ function initTypeRef(ns, typeRef, name, nodes) {
 }
 function initNodes(nodes) {
     var currentNS = null;
-    nodes.forEach(node=> {
+    nodes.forEach(node => {
         if (node.nodeType == NODE.NS) {
             currentNS = node;
         }
 
-        if (node.nodeType == NODE.TYPE || node.nodeType == NODE.METHOD) {
+        if (node.nodeType == NODE.TYPE ||
+            node.nodeType == NODE.METHOD ||
+            node.nodeType == NODE.TABLE) {
             if (!currentNS) {
                 throw new Error('ns definition is missing.');
             }
@@ -102,7 +117,7 @@ function initNodes(nodes) {
         }
 
         if (node.nodeType == NODE.TYPE) {
-            node.fields.forEach(field=> {
+            node.fields.forEach(field => {
                 initTypeRef(currentNS, field.typeRef, `FD_${node.name}_${firstCharUpper(field.name)}`, nodes);
             });
         }
@@ -124,6 +139,7 @@ function checkAST(nodes) {
     var nodeList = new NodeList(nodes);
 
     checkNamedNodes(nodeList);
+    checkTables(nodeList);
     checkTypes(nodeList);
     checkMethods(nodeList);
 

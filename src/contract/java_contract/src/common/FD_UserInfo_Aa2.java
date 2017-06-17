@@ -1,5 +1,6 @@
 
         package common;
+        import java.util.Date;
         public class FD_UserInfo_Aa2 {
             
             public final int abc;

@@ -1,5 +1,6 @@
 
         package common;
+        import java.util.Date;
         public class METHOD_ARG_getTime2 {
             
             public final int www;

@@ -1,5 +1,6 @@
 
         package aaaaaaaaaa;
+        import java.util.Date;
         public class METHOD_RET_getTime3 {
             
             public final int abc;

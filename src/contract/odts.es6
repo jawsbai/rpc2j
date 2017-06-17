@@ -102,7 +102,7 @@ class ODTInt extends ODT {
     }
 }
 
-class ODTDate extends ODT {
+class ODTTime extends ODT {
     constructor() {
         super();
     }
@@ -151,11 +151,11 @@ var map = {
     'byte': new ODTByte(),
     'short': new ODTShort(),
     'int': new ODTInt(),
-    "date": new ODTDate(),
+    "time": new ODTTime(),
     'string': new ODTString()
 };
 
 module.exports = {
     map: map,
-    types: [map.bool, map.byte, map.short, map.int, map.date, map.string]
+    types: [map.bool, map.byte, map.short, map.int, map.time, map.string]
 };

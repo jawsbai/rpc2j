@@ -1,5 +1,6 @@
 
         package common;
+        import java.util.Date;
         public class UserInfo334 {
             
             public final int[] ss;

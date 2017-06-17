@@ -48,6 +48,42 @@ class AST {
         };
     }
 
+    _parse_table(list) {
+        if (list.length < 3) {
+            return null;
+        }
+        var fields = [];
+        for (var i = 2; i < list.length; i++) {
+            var field = this._parseTableField(list[i]);
+            if (field) {
+                fields.push(field);
+            }
+        }
+        return {
+            nodeType: NODE.TABLE,
+            ns: '',
+            name: list[1],
+            fields: fields
+        };
+    }
+
+    _parseTableField(expr) {
+        var mh = expr.match(/(.+)\:(\w+)(\[\d+\])?/);
+        if (!mh) {
+            return null;
+        }
+        var len = 0;
+        if (mh[3]) {
+            len = parseInt(mh[3].replace(/[\[\]]/g, ''));
+        }
+        return {
+            nodeType: NODE.TABLE_FIELD,
+            name: mh[1],
+            type: mh[2],
+            len: len
+        };
+    }
+
     _parse_type(list) {
         if (list.length < 3) {
             return null;
@@ -91,7 +127,7 @@ class AST {
         if (isArray) {
             name = mh[1];
         }
-        var [ns,n] = this._parseFullName(name);
+        var [ns, n] = this._parseFullName(name);
         if (!n) {
             return null;
         }
@@ -126,16 +162,16 @@ class AST {
     }
 
     _findInline(id) {
-        return this._tokens.inlines.filter(item=>item.id == id)[0];
+        return this._tokens.inlines.filter(item => item.id == id)[0];
     }
 
     _findList() {
-        return this._tokens.list.filter(item=> item.length && this._findParse(item[0]));
+        return this._tokens.list.filter(item => item.length && this._findParse(item[0]));
     }
 
     parse() {
         var nodes = [];
-        this._findList().forEach(list=> {
+        this._findList().forEach(list => {
             var parse = this._findParse(list[0]);
             var node = parse.bind(this)(list);
             if (node) {

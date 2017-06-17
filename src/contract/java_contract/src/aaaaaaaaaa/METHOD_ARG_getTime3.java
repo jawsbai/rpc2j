@@ -1,5 +1,6 @@
 
         package aaaaaaaaaa;
+        import java.util.Date;
         public class METHOD_ARG_getTime3 {
             
             public final int name;

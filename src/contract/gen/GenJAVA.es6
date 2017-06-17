@@ -1,6 +1,7 @@
 var Gen = require('./Gen.es6'),
     GEN = require('../GEN.es6'),
     odts = require('../odts.es6'),
+    tablefieldTypes = require('../tablefieldTypes.es6'),
     CodeFile = require('../CodeFile.es6'),
     P = require('path'),
     FileUtil = require('../../common/FileUtil.es6'),
@@ -12,31 +13,104 @@ class GenJAVA extends Gen {
     }
 
     _makeTypes() {
-        return this._nodeList.findTypes().map(typeNode=>this._makeType(typeNode));
+        return this._nodeList.findTypes().map(typeNode => this._makeType(typeNode));
     }
 
     _makeType(typeNode) {
         var typeName = typeNode.name;
         var codeFile = new CodeFile(typeNode.ns, typeName);
 
-        var args = this.mapTypeFields(typeNode, (f, t)=> {
+        var args = this.mapTypeFields(typeNode, (f, t) => {
             return `${t.nameTypeExpr(this.lang)} ${f.name}`;
         });
 
         codeFile.append(`
         package ${typeNode.ns};
+        import java.util.Date;
         public class ${typeName} {
-            ${this.mapTypeFields(typeNode, (f, t)=>`
+            ${this.mapTypeFields(typeNode, (f, t) => `
             public final ${t.nameTypeExpr(this.lang)} ${f.name};`).join('\n')}
 
             public ${typeName}(){
-                ${this.mapTypeFields(typeNode, (f, t)=>`
+                ${this.mapTypeFields(typeNode, (f, t) => `
                 this.${f.name}=${t.getEmpty(this.lang)};`).join('\n')}
             }
 
             public ${typeName}(${args.join(', ')}){
-                ${this.mapTypeFields(typeNode, (f, t)=>`
+                ${this.mapTypeFields(typeNode, (f, t) => `
                 this.${f.name}=${f.name};`).join('\n')}
+            }
+        }`);
+
+        return codeFile;
+    }
+
+    _makeTables() {
+        return this._nodeList.findTables().map(tableNode => this._makeTable(tableNode));
+    }
+
+    _makeTable(tableNode) {
+        var typeName = tableNode.name;
+        var codeFile = new CodeFile(tableNode.ns, typeName);
+
+        var args = tableNode.fields.map(f => {
+            return `${f.otype} ${f.name}`;
+        });
+
+        var fields1 = tableNode.fields.map(f => {
+            return `public static final ${f.type} FD_${f.name.toUpperCase()}=new ${f.type}("${f.name.toLowerCase()}"${f.len ? `,${f.len}` : ''});`;
+        });
+        var fields2 = tableNode.fields.map(f => {
+            return `private ${f.otype} ${f.name};
+            public void set${firstCharUpper(f.name)}(${f.otype} value){
+                ${f.name}=value;
+            }
+            public ${f.otype} get${firstCharUpper(f.name)}(){
+                return ${f.name};
+            }`;
+        });
+
+        codeFile.append(`
+        package ${tableNode.ns};
+        import java.sql.ResultSet;
+        import toolkit.database.expr.EQ;
+        import toolkit.database.fields.*;
+        import toolkit.database.TableName;
+        import toolkit.database.TableDefined;
+        import java.util.Date;
+        public class ${typeName} {
+            ${fields1.join('\n')}
+            
+            ${fields2.join('\n')}
+            
+            public ${typeName}(${args.join(', ')}){
+                ${tableNode.fields.map(f => `this.${f.name}=${f.name};`).join('\n')}
+            }
+            
+            public static ${typeName} newFromRS(ResultSet rs){
+                return new ${typeName}(
+                    ${tableNode.fields.map(f =>
+            `FD_${f.name.toUpperCase()}.getValue(rs)`).join(',\n')}
+                );
+            }
+            
+            public static TableDefined newTableDefined(){
+                return new TableDefined(
+                    new TableName("${typeName}"),
+                    ${tableNode.fields.map(f =>
+            `FD_${f.name.toUpperCase()}`).join(',\n')}
+                );
+            }
+            
+            public EQ[] toEQS(){
+                return toEQS(this);
+            }
+            
+            public static EQ[] toEQS(${typeName} table){
+                EQ[] eqs=new EQ[${tableNode.fields.length}];
+                ${tableNode.fields.map((f, i) =>
+            `eqs[${i}]=FD_${f.name.toUpperCase()}.eq(table.${f.name});`).join('\n')}
+                return eqs;
             }
         }`);
 
@@ -70,7 +144,7 @@ class GenJAVA extends Gen {
                 super(bytes);
             }
             
-            ${this.mapODTS((t, n)=>`
+            ${this.mapODTS((t, n) => `
             public ${n}[] read${firstCharUpper(n)}Array(){
                 int length=readInt();
                 ${n}[] array=new ${n}[length];
@@ -80,10 +154,10 @@ class GenJAVA extends Gen {
                 return array;
             }`).join('\n')}
             
-            ${this.mapTypes((t, ns, n)=>`
+            ${this.mapTypes((t, ns, n) => `
             public ${ns}.${n} read${firstCharUpper(n)}(){
                 return new ${ns}.${n}(
-                ${this.mapTypeFields(t, (f, t2)=>`
+                ${this.mapTypeFields(t, (f, t2) => `
                 ${t2.getRead(this.lang)}()`).join(',')}
                 );
             }
@@ -104,7 +178,7 @@ class GenJAVA extends Gen {
         import java.util.Date;
         public class ${GEN.TYPE_WRITER} extends ${GEN.RPC2J}.${GEN.BYTE_ARRAY_WRITER} {
             
-            ${this.mapODTS((t, n)=>`
+            ${this.mapODTS((t, n) => `
             public void write${firstCharUpper(n)}Array(${n}[] array){
                 int length=array.length;
                 writeInt(length);
@@ -113,9 +187,9 @@ class GenJAVA extends Gen {
                 }
             }`).join('\n')}
             
-            ${this.mapTypes((t, ns, n)=>`
+            ${this.mapTypes((t, ns, n) => `
             public void write${firstCharUpper(n)}(${ns}.${n} value){
-                ${this.mapTypeFields(t, (f, t2)=>`
+                ${this.mapTypeFields(t, (f, t2) => `
                 ${t2.getWrite(this.lang)}(value.${f.name});`).join('\n')}
             }
             public void write${firstCharUpper(n)}Array(${ns}.${n}[] array){
@@ -244,7 +318,7 @@ class GenJAVA extends Gen {
             public ${GEN.END_REMOTE}(){
             }
             
-            ${this.mapMethods(methods, (i, m, a, r, at, rt)=>`
+            ${this.mapMethods(methods, (i, m, a, r, at, rt) => `
                 public void ${m.name}(${a ? `${at.nameTypeExpr(this.lang)} value` : ''}){
                     ${GEN.RPC2J}.${GEN.TYPE_WRITER} writer=new ${GEN.RPC2J}.${GEN.TYPE_WRITER}();
                     ${GEN.RPC2J}.${GEN.MESSAGE} message=${GEN.RPC2J}.${GEN.MESSAGE}.newRequest(this._newMessageID(), ${i});
@@ -267,7 +341,7 @@ class GenJAVA extends Gen {
             }
             
             protected void _handle(${GEN.RPC2J}.${GEN.TYPE_READER} reader, ${GEN.RPC2J}.${GEN.MESSAGE} message){
-                ${this.mapMethods(methods, (i, m, a, r, at, rt)=>`
+                ${this.mapMethods(methods, (i, m, a, r, at, rt) => `
                     if(message.methodID==${i}){
                         this.${m.name}(${a ? `reader.${at.getRead(this.lang)}()` : ''})${r ? `
                             // .then(ret=>{
@@ -288,7 +362,7 @@ class GenJAVA extends Gen {
                 `).join('else')}
             }
             
-            ${this.mapMethods(methods, (i, m, a, r, at, rt)=>`
+            ${this.mapMethods(methods, (i, m, a, r, at, rt) => `
                 protected void ${m.name}(${a ? `${at.nameTypeExpr(this.lang)} value` : ''}){
                 }
             `).join('\n')}
@@ -313,16 +387,17 @@ class GenJAVA extends Gen {
             this._makeReceiver(),
             this._makeEndRemote(),
             this._makeEndLocal(),
-            ...this._makeRemotes(item=>item.end != this.end, this._makeEndRemoteByNS.bind(this)),
-            ...this._makeRemotes(item=>item.end == this.end, this._makeEndLocalByNS.bind(this)),
+            ...this._makeRemotes(item => item.end != this.end, this._makeEndRemoteByNS.bind(this)),
+            ...this._makeRemotes(item => item.end == this.end, this._makeEndLocalByNS.bind(this)),
             this._makeByteArrayReader(),
             this._makeByteArrayWriter(),
             this._makeTypeReader(),
             this._makeTypeWriter(),
-            ...this._makeTypes()
+            ...this._makeTypes(),
+            ...this._makeTables()
         ];
 
-        codeFiles.forEach(codeFile=> {
+        codeFiles.forEach(codeFile => {
             this.writeFile(codeFile, '.java');
         });
     }

@@ -1,5 +1,6 @@
 
         package common;
+        import java.util.Date;
         public class UserInfo {
             
             public final String aa;
