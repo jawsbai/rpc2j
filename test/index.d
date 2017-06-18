@@ -2,6 +2,23 @@
 (gen JAVA   server C:\Users\admin\Desktop\github\rpc2j\src\contract\java_contract\src)
 (gen JS     client C:\Users\admin\Desktop\github\rpc2j\test\rpc2j.es6)
 
+(ns dic)
+
+(dic HeroType
+    aaa:111
+    bbb:111
+    ddd:llllllll
+    sss:[2,3,4,5]
+    ss:true
+    SS:111)
+
+(dic Str
+    zh_ssss:我我我我玩[s]生三世
+    bbb:haahahahah
+    ss:true
+    ddd:2222
+    SS:ssssss)
+
 (ns table)
 
 (table Player

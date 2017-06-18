@@ -108,7 +108,8 @@ function initNodes(nodes) {
 
         if (node.nodeType == NODE.TYPE ||
             node.nodeType == NODE.METHOD ||
-            node.nodeType == NODE.TABLE) {
+            node.nodeType == NODE.TABLE ||
+            node.nodeType == NODE.DIC) {
             if (!currentNS) {
                 throw new Error('ns definition is missing.');
             }

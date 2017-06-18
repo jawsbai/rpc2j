@@ -48,6 +48,49 @@ class AST {
         };
     }
 
+    _parse_dic(list) {
+        if (list.length < 3) {
+            return null;
+        }
+        var values = [];
+        for (var i = 2; i < list.length; i++) {
+            var value = this._parseDicValue(list[i]);
+            if (value) {
+                values.push(value);
+            }
+        }
+        // console.log(values);
+        return {
+            nodeType: NODE.DIC,
+            ns: '',
+            name: list[1],
+            values: values
+        };
+    }
+
+    _parseDicValue(expr) {
+        var mh = expr.match(/(.+)\:(.+)/);
+        if (!mh) {
+            return null;
+        }
+        var value = mh[2];
+        if (value === 'true' || value === 'false') {
+            value = value === 'true';
+        } else {
+            var n = parseInt(value);
+            if (n) {
+                value = n;
+            } else {
+                value = value.replace(/\[s\]/g, ' ');
+            }
+        }
+        return {
+            nodeType: NODE.DIC_VALUE,
+            name: mh[1],
+            value: value
+        };
+    }
+
     _parse_table(list) {
         if (list.length < 3) {
             return null;
@@ -79,6 +122,7 @@ class AST {
         return {
             nodeType: NODE.TABLE_FIELD,
             name: mh[1],
+            otype: null,
             type: mh[2],
             len: len
         };

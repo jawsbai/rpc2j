@@ -94,12 +94,16 @@ class GenJAVA extends Gen {
                 );
             }
             
-            public static TableDefined newTableDefined(){
+            public static TableDefined newTableDefined(String tableName){
                 return new TableDefined(
-                    new TableName("${typeName}"),
+                    new TableName(tableName),
                     ${tableNode.fields.map(f =>
             `FD_${f.name.toUpperCase()}`).join(',\n')}
                 );
+            }
+            
+            public static TableDefined newTableDefined(){
+                return newTableDefined("${typeName}");
             }
             
             public EQ[] toEQS(){
@@ -114,6 +118,91 @@ class GenJAVA extends Gen {
             }
         }`);
 
+        return codeFile;
+    }
+
+    _makeDics() {
+        return this._nodeList.findDics().map(dicNode => this._makeDic(dicNode));
+    }
+
+    _makeDic(dicNode) {
+        var typeName = dicNode.name;
+        var codeFile = new CodeFile(dicNode.ns, typeName);
+
+        function value(v) {
+            var tv = typeof v;
+            if (tv === 'number' || tv === 'boolean') {
+                return v;
+            }
+            return `"${v}"`;
+        }
+
+
+        codeFile.append(`
+        package ${dicNode.ns};
+        import java.util.Objects;
+        public class ${typeName} {
+            public final String key;
+            public final Object value;
+        
+            public ${typeName}(String key, Object value){
+                this.key=key;
+                this.value=value;
+            }
+            
+            public int getInt(){
+                if(value instanceof Integer){
+                    return (int)value;
+                }
+                return 0;
+            }
+            
+            public String getString(){
+                if(value instanceof String){
+                    return (String)value;
+                }
+                return "";
+            }
+            
+            public Boolean getBoolean(){
+                if(value instanceof Boolean){
+                    return (Boolean)value;
+                }
+                return false;
+            }
+            
+            ${dicNode.values.map(item =>
+            `public static final ${typeName} ${item.name.toUpperCase()}=new ${typeName}("${item.name}", ${value(item.value)});`).join('\n')}
+            
+            private static final ${typeName}[] items=new ${typeName}[]{
+                ${dicNode.values.map(item => item.name.toUpperCase())}
+            };
+            
+            public static ${typeName}[] getItems(){
+                int len=items.length;
+                ${typeName}[] newItems=new ${typeName}[len];
+                System.arraycopy(items,0,newItems,0,len);
+                return newItems;
+            }
+            
+            public static ${typeName} getByKey(String key) {
+                for (${typeName} item : items) {
+                    if (Objects.equals(item.key, key)) {
+                        return item;
+                    }
+                }
+                return null;
+            }
+            
+            public static ${typeName} getByValue(Object value) {
+                for (${typeName} item : items) {
+                    if (Objects.equals(item.value, value)) {
+                        return item;
+                    }
+                }
+                return null;
+            }
+        }`);
         return codeFile;
     }
 
@@ -394,7 +483,8 @@ class GenJAVA extends Gen {
             this._makeTypeReader(),
             this._makeTypeWriter(),
             ...this._makeTypes(),
-            ...this._makeTables()
+            ...this._makeTables(),
+            ...this._makeDics()
         ];
 
         codeFiles.forEach(codeFile => {

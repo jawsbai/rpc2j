@@ -57,9 +57,9 @@ FD_CREATETIME.getValue(rs)
                 );
             }
             
-            public static TableDefined newTableDefined(){
+            public static TableDefined newTableDefined(String tableName){
                 return new TableDefined(
-                    new TableName("Player"),
+                    new TableName(tableName),
                     FD_PLAYERID,
 FD_USERID,
 FD_ONLINE,
@@ -67,13 +67,20 @@ FD_CREATETIME
                 );
             }
             
+            public static TableDefined newTableDefined(){
+                return newTableDefined("Player");
+            }
+            
+            public EQ[] toEQS(){
+                return toEQS(this);
+            }
+            
             public static EQ[] toEQS(Player table){
-                int len=4;
-                EQ[] eqs=new EQ[len];
-                eqs[0]=new EQ(FD_PLAYERID, table.playerId),
-eqs[1]=new EQ(FD_USERID, table.userId),
-eqs[2]=new EQ(FD_ONLINE, table.online),
-eqs[3]=new EQ(FD_CREATETIME, table.createTime)
+                EQ[] eqs=new EQ[4];
+                eqs[0]=FD_PLAYERID.eq(table.playerId);
+eqs[1]=FD_USERID.eq(table.userId);
+eqs[2]=FD_ONLINE.eq(table.online);
+eqs[3]=FD_CREATETIME.eq(table.createTime);
                 return eqs;
             }
         }

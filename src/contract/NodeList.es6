@@ -33,6 +33,10 @@ class NodeList {
         return this._findNodes(NODE.TABLE);
     }
 
+    findDics() {
+        return this._findNodes(NODE.DIC);
+    }
+
     findMethods() {
         return this._findNodes(NODE.METHOD);
     }
