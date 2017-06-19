@@ -342,20 +342,20 @@ class GenJAVA extends Gen {
         return new CodeFile(GEN.RPC2J, GEN.RECEIVER).append(`
         package ${GEN.RPC2J};
         public class ${GEN.RECEIVER} {
-            private final ${GEN.END_REMOTE} _remote;
-            private final ${GEN.END_LOCAL} _local;
+            private final ${GEN.END_REMOTE} remote;
+            private final ${GEN.END_LOCAL} local;
             public ${GEN.RECEIVER}(${GEN.END_REMOTE} remote, ${GEN.END_LOCAL} local) {
-                _remote=remote;
-                _local=local;
+                this.remote=remote;
+                this.local=local;
             }
             
             public void receive(byte[] bytes){
                 ${GEN.TYPE_READER} reader=new ${GEN.TYPE_READER}(bytes);
                 ${GEN.MESSAGE} message=${GEN.MESSAGE}.read(reader);
                 if(message.type==1 || message.type==3){
-                    _remote._handle(reader, message);
+                    this.remote.handle(reader, message);
                 }else if(message.type==2){
-                    _local._handle(reader, message);
+                    this.local.handle(reader, message);
                 }
             }
         }`);
@@ -364,39 +364,27 @@ class GenJAVA extends Gen {
     _makeEndRemote() {
         return new CodeFile(GEN.RPC2J, GEN.END_REMOTE).append(`
         package ${GEN.RPC2J};
-        public class ${GEN.END_REMOTE} {
+        public abstract class ${GEN.END_REMOTE} {
             public ${GEN.END_REMOTE}() {
             }
         
-            protected int _newMessageID() {
-                return 0;
-            }
-        
-            protected void _sendMessage(${GEN.TYPE_WRITER} writer, ${GEN.MESSAGE} message) {
-            }
-            
-            protected void _handle(${GEN.TYPE_READER} reader, ${GEN.MESSAGE} message){
-            }
+            protected abstract int newMessageID();        
+            protected abstract void sendMessage(${GEN.TYPE_WRITER} writer, ${GEN.MESSAGE} message);            
+            protected abstract void handle(${GEN.TYPE_READER} reader, ${GEN.MESSAGE} message);
         }`);
     }
 
     _makeEndLocal() {
         return new CodeFile(GEN.RPC2J, GEN.END_LOCAL).append(`
         package ${GEN.RPC2J};
-        public class ${GEN.END_LOCAL} {
+        public abstract class ${GEN.END_LOCAL} {
             public ${GEN.END_LOCAL}() {
         
             }
             
-            protected int _newMessageID() {
-                return 0;
-            }
-        
-            protected void _sendMessage(${GEN.TYPE_WRITER} writer, ${GEN.MESSAGE} message) {
-            }
-            
-            protected void _handle(${GEN.TYPE_READER} reader, ${GEN.MESSAGE} message){
-            }
+            protected abstract int newMessageID();        
+            protected abstract void sendMessage(${GEN.TYPE_WRITER} writer, ${GEN.MESSAGE} message);            
+            protected abstract void handle(${GEN.TYPE_READER} reader, ${GEN.MESSAGE} message);
         }`);
     }
 

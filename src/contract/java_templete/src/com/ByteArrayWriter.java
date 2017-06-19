@@ -12,21 +12,21 @@ public class ByteArrayWriter {
         int position = 0;
     }
 
-    private Node _begin;
-    private Node _current;
+    private Node begin;
+    private Node current;
 
     public ByteArrayWriter() {
-        _current = new Node();
-        _begin = _current;
+        current = new Node();
+        begin = current;
     }
 
     public int length() {
-        return _current.index * MAX_LEN + _current.position;
+        return current.index * MAX_LEN + current.position;
     }
 
     public byte[] toArray() {
         byte[] bytes = new byte[length()];
-        Node node = _begin;
+        Node node = begin;
         while (node != null) {
             System.arraycopy(node.data, 0, bytes, node.index * MAX_LEN, node.position);
 //            Console.log(node.index, node.position);
@@ -40,14 +40,14 @@ public class ByteArrayWriter {
     }
 
     public void writeByte(byte value) {
-        _current.data[_current.position] = value;
-        _current.position++;
+        current.data[current.position] = value;
+        current.position++;
 
-        if (_current.position == MAX_LEN) {
+        if (current.position == MAX_LEN) {
             Node current = new Node();
-            current.index = _current.index + 1;
-            _current.next = current;
-            _current = current;
+            current.index = this.current.index + 1;
+            this.current.next = current;
+            this.current = current;
         }
     }
 

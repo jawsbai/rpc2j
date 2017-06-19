@@ -4,12 +4,12 @@ package com;
 import java.util.Date;
 
 public class ByteArrayReader {
-    private byte[] _bytes;
-    private int _position;
+    private final byte[] bytes;
+    private int position;
 
     public ByteArrayReader(byte[] bytes) {
-        _bytes = bytes;
-        _position = 0;
+        this.bytes = bytes;
+        position = 0;
     }
 
     public boolean readBoolean() {
@@ -17,8 +17,8 @@ public class ByteArrayReader {
     }
 
     public byte readByte() {
-        byte b = _bytes[_position];
-        _position++;
+        byte b = bytes[position];
+        position++;
         return b;
     }
 
