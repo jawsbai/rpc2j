@@ -30,7 +30,7 @@ class GenJAVA extends Gen {
         import java.util.ArrayList;
         public class ${typeName} {
             ${this.mapTypeFields(typeNode, (f, t) => `
-            public final ${t.nameTypeExpr(this.lang)} ${f.name};`).join('\n')}
+            public ${t.nameTypeExpr(this.lang)} ${f.name};`).join('\n')}
 
             public ${typeName}(){
                 ${this.mapTypeFields(typeNode, (f, t) => `
