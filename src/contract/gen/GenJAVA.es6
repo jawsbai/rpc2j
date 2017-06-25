@@ -27,6 +27,7 @@ class GenJAVA extends Gen {
         codeFile.append(`
         package ${typeNode.ns};
         import java.util.Date;
+        import java.util.ArrayList;
         public class ${typeName} {
             ${this.mapTypeFields(typeNode, (f, t) => `
             public final ${t.nameTypeExpr(this.lang)} ${f.name};`).join('\n')}
@@ -39,6 +40,15 @@ class GenJAVA extends Gen {
             public ${typeName}(${args.join(', ')}){
                 ${this.mapTypeFields(typeNode, (f, t) => `
                 this.${f.name}=${f.name};`).join('\n')}
+            }
+            
+            public static ${typeName}[] toArray(ArrayList<${typeName}> list){
+                int size=list.size();
+                ${typeName}[] array=new ${typeName}[size];
+                for (int i = 0; i < size; i++) {
+                    array[i]=list.get(i);
+                }
+                return array;
             }
         }`);
 
